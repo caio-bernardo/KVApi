@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 use std::{
     collections::HashMap,
     sync::{Arc, RwLock},
@@ -86,7 +85,7 @@ async fn set_item(
     info!("POST /api/:key/:value");
     let db = &mut state.write().unwrap().db;
     match db.insert(key, value) {
-        Some(value) => (StatusCode::OK, "Updated Successfuly").into_response(),
+        Some(_) => (StatusCode::OK, "Updated Successfuly").into_response(),
         None => (StatusCode::CREATED, "Created Successfuly").into_response(),
     }
 }
