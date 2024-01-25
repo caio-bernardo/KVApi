@@ -1,18 +1,17 @@
-# KVAPI
+# KVApi
 
 A Key-Value Store Web API project.
 
-## Application-Story
+## Application Story
 
-1. As a user, I want to:
-    ~a. Make requests to the api endpoint;~
-    ~b. Set key to corresponding values;~
-    ~c. Delete values by the key;~
-    ~d. See all the key value pairs;~
-    ~e. Update values by their keys;~
-2. As a developer, I want to:
-    a. See unit-tests;
-
+1. As a user, I want:
+    - [x] Make all CRUD operations
+    - [ ] Store data privately
+    - [ ] Persist data between sessions and reloads
+2. As a developer, I want:
+    - [ ] Logging and Tracing
+    - [ ] Error handling
+    - [ ] Tests
 
 ## Inspired by
 + [More challenging projects every programmer should try](https://austinhenley.com/blog/morechallengingprojects.html)
