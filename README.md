@@ -9,7 +9,7 @@ A Key-Value Store Web API project.
     - [ ] Store data privately
     - [ ] Persist data between sessions and reloads
 2. As a developer, I want:
-    - [ ] Logging and Tracing
+    - [x] Logging and Tracing
     - [ ] Error handling
     - [ ] Tests
 
