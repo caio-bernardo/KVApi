@@ -7,26 +7,7 @@ use axum::{
     routing::get,
     Json, Router,
 };
-use tower_http::trace::{self, TraceLayer};
-use tracing::Level;
-
-pub fn routes() -> Router {
-    let state = AppState::default();
-    Router::new()
-        .route("/health", get(health_handler))
-        .nest("/api", api_routes(state))
-        .layer(
-            TraceLayer::new_for_http()
-                .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
-                .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
-        )
-}
-
-async fn health_handler() -> impl IntoResponse {
-    (StatusCode::OK, "Hi, I'm healthy!").into_response()
-}
-
-fn api_routes(state: AppState) -> Router {
+pub fn api_routes(state: AppState) -> Router {
     Router::new()
         .route("/", get(list_item))
         .route("/:key", get(get_item).post(set_item).delete(delete_item))

@@ -15,9 +15,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = routes::routes();
 
+    let listener = TcpListener::bind(IP_ADDRESS).await.unwrap();
+
     info!("Listening on http://{}", IP_ADDRESS);
 
-    let listener = TcpListener::bind(IP_ADDRESS).await.unwrap();
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
