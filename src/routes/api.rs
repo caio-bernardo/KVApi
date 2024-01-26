@@ -50,3 +50,51 @@ async fn delete_item(State(state): State<AppState>, Path(key): Path<String>) -> 
             .into_response(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use axum::{body::Body, extract::Request};
+    use http_body_util::BodyExt;
+    use tower::ServiceExt;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn get_item_found() {
+        let (key, value) = ("a", "1");
+        let mock_state = AppState::default();
+        mock_state
+            .db
+            .write()
+            .unwrap()
+            .insert(key.to_string(), value.to_string());
+
+        let req = Request::builder()
+            .uri(format!("/{key}"))
+            .body(Body::empty())
+            .unwrap();
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::FOUND);
+
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, value)
+    }
+
+    #[tokio::test]
+    async fn get_item_key_not_found() {
+        let mock_state = AppState::default();
+        let req = Request::builder().uri("/a").body(Body::empty()).unwrap();
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, "a not found in db");
+    }
+}
