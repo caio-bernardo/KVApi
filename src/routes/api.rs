@@ -34,27 +34,28 @@ async fn set_item(
 ) -> impl IntoResponse {
     let db = &mut state.db.write().unwrap();
     match db.insert(key, value) {
-        Some(_) => (StatusCode::OK, "Updated Successfuly").into_response(),
-        None => (StatusCode::CREATED, "Created Successfuly").into_response(),
+        Some(_) => (StatusCode::OK, "Item Updated").into_response(),
+        None => (StatusCode::CREATED, "Item Created").into_response(),
     }
 }
 
 async fn delete_item(State(state): State<AppState>, Path(key): Path<String>) -> impl IntoResponse {
     let db = &mut state.db.write().unwrap();
     match db.remove(&key) {
-        Some(value) => (StatusCode::OK, format!("{} deleted successfuly", value)).into_response(),
-        None => (
-            StatusCode::NOT_FOUND,
-            format!("{} not found in database", key),
-        )
-            .into_response(),
+        Some(value) => (StatusCode::OK, value).into_response(),
+        None => (StatusCode::NOT_FOUND, format!("{} not found", key)).into_response(),
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use axum::{body::Body, extract::Request};
+    use std::arch::x86_64::_mm256_maskz_extracti32x4_epi32;
+
+    use axum::{
+        body::Body,
+        http::{Method, Request},
+    };
     use http_body_util::BodyExt;
     use tower::ServiceExt;
 
@@ -96,5 +97,96 @@ mod tests {
         let body = String::from_utf8_lossy(&body);
 
         assert_eq!(body, "a not found in db");
+    }
+
+    #[tokio::test]
+    async fn set_item_create_new() {
+        let (key, value) = ("a", "1");
+        let mock_state = AppState::default();
+
+        let req = Request::builder()
+            .method(Method::POST)
+            .uri(format!("/{key}"))
+            .body(Body::from(value))
+            .unwrap();
+
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::CREATED);
+
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, "Item Created");
+    }
+
+    #[tokio::test]
+    async fn set_item_update_old() {
+        let (key, old_value, new_value) = ("a", "1", "2");
+        let mock_state = AppState::default();
+        mock_state
+            .db
+            .write()
+            .unwrap()
+            .insert(key.to_string(), old_value.to_string());
+
+        let req = Request::builder()
+            .method(Method::POST)
+            .uri(format!("/{key}"))
+            .body(Body::from(new_value))
+            .unwrap();
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, "Item Updated");
+    }
+
+    #[tokio::test]
+    async fn delete_item_ok() {
+        let (key, value) = ("a", "1");
+        let mock_state = AppState::default();
+        mock_state
+            .db
+            .write()
+            .unwrap()
+            .insert(key.to_string(), value.to_string());
+
+        let req = Request::builder()
+            .method(Method::DELETE)
+            .uri(format!("/{key}"))
+            .body(Body::empty())
+            .unwrap();
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, value);
+    }
+
+    #[tokio::test]
+    async fn delete_item_not_found() {
+        let (key, _) = ("a", "1");
+        let mock_state = AppState::default();
+
+        let req = Request::builder()
+            .method(Method::DELETE)
+            .uri(format!("/{key}"))
+            .body(Body::empty())
+            .unwrap();
+
+        let res = api_routes(mock_state).oneshot(req).await.unwrap();
+
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let body = String::from_utf8_lossy(&body);
+
+        assert_eq!(body, format!("{key} not found"));
     }
 }
