@@ -2,17 +2,26 @@
 
 A Key-Value Store Web API project.
 
-## Application Story
+## Features
 
-1. As a user, I want:
-    - [x] Make all CRUD operations
-    - [ ] Store data privately
-    - [ ] Persist data between sessions and reloads
-2. As a developer, I want:
-    - [x] Logging and Tracing
-    - [ ] Error handling
-    - [ ] Tests
+- [x] In Memory Database
+- [x] CRUD Operations
+
+## Usage
+
+Clone this repo, go to the working directory and run de server.
+
+```
+cargo run
+```
+
+Make your requests
+
+```
+curl http://localhost:8080/health
+```
 
 ## Inspired by
-+ [More challenging projects every programmer should try](https://austinhenley.com/blog/morechallengingprojects.html)
-+ [kvdb.io](https://kvdb.io/)
+
+- [More challenging projects every programmer should try](https://austinhenley.com/blog/morechallengingprojects.html)
+- [kvdb.io](https://kvdb.io/)

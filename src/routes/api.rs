@@ -50,8 +50,6 @@ async fn delete_item(State(state): State<AppState>, Path(key): Path<String>) -> 
 #[cfg(test)]
 mod tests {
 
-    use std::arch::x86_64::_mm256_maskz_extracti32x4_epi32;
-
     use axum::{
         body::Body,
         http::{Method, Request},
