@@ -10,7 +10,7 @@ use axum::{
 pub fn api_routes(state: AppState) -> Router {
     Router::new()
         .route("/", get(list_item))
-        .route("/:key", get(get_item).post(set_item).delete(delete_item))
+        .route("/:key", get(get_item).put(set_item).delete(delete_item))
         .with_state(state)
 }
 
@@ -103,7 +103,7 @@ mod tests {
         let mock_state = AppState::default();
 
         let req = Request::builder()
-            .method(Method::POST)
+            .method(Method::PUT)
             .uri(format!("/{key}"))
             .body(Body::from(value))
             .unwrap();
@@ -129,7 +129,7 @@ mod tests {
             .insert(key.to_string(), old_value.to_string());
 
         let req = Request::builder()
-            .method(Method::POST)
+            .method(Method::PUT)
             .uri(format!("/{key}"))
             .body(Body::from(new_value))
             .unwrap();
