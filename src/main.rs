@@ -19,9 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Listening on http://{}", IP_ADDRESS);
 
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+    axum::serve(listener, app.into_make_service()).await?;
 
     Ok(())
 }

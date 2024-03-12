@@ -9,15 +9,15 @@ A Key-Value Store Web API project.
 
 ## Usage
 
-Clone this repo, go to the working directory and run de server.
+Clone this repo, go to the working directory and run the server.
 
-```
+```bash
 cargo run
 ```
 
 Make your requests
 
-```
+```bash
 curl http://localhost:8080/health
 ```
 
